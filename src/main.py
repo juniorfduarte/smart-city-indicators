@@ -1,16 +1,12 @@
 from data_loader import load_data
 from indicators import ranking_pib
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_PATH = BASE_DIR / "data" / "dados_ibge_pr.xlsx"
 
 
 def space():
     print("------------------------------------------------------------------------------")
 
 
-df = load_data(DATA_PATH.__str__())
+df = load_data()
 
 # print(df.head())
 # space()
