@@ -2,6 +2,8 @@ from data_loader import load_data
 from indicators import ranking_pib
 
 
+# Origem dos dados: https://www.ibge.gov.br/cidades-e-estados/pr/maringa.html
+
 def space():
     print("------------------------------------------------------------------------------")
 

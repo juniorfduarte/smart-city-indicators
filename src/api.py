@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from src.data_loader import load_data
 from src.indicators import ranking_pib, ranking_idhm, ranking_densidade
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -13,7 +14,11 @@ def root():
 
 
 @app.get("/cidades")
-def get_cidades():
+def get_cidades(nome: str = None):
+    if nome:
+        resultado = df[df["municipio"].str.contains(nome, case=False)]
+        return resultado.to_dict(orient="records")
+
     return df.to_dict(orient="records")
 
 
@@ -30,3 +35,13 @@ def get_ranking_idhm(top_n: int = 10):
 @app.get("/ranking/densidade")
 def get_ranking_densidade(top_n: int = 10):
     return ranking_densidade(df, top_n)
+
+
+@app.get("/cidades/{nome}")
+def get_cidade(nome: str):
+    resultado = df[df["municipio"].str.lower() == nome.lower()]
+
+    if resultado.empty:
+        raise HTTPException(status_code=404, detail="Cidade não encontrada")
+
+    return resultado.to_dict(orient="records")[0]
