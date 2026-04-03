@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.data_loader import load_data
+from src.data_loader import load_data, normalizar_texto
 from src.indicators import ranking_pib, ranking_idhm, ranking_densidade
 from fastapi import HTTPException
 
@@ -10,13 +10,19 @@ df = load_data()
 
 @app.get("/")
 def root():
-    return {"message": "Smart Cities API está rodando 🚀 \n Desenvolvido por: Francisco Junior" }
+    return {"message": "Smart Cities API está rodando 🚀 \n Desenvolvido por: Francisco Junior"}
 
 
 @app.get("/cidades")
 def get_cidades(nome: str = None):
     if nome:
-        resultado = df[df["municipio"].str.contains(nome, case=False)]
+        nome_normalizado = normalizar_texto(nome)
+
+        resultado = df[
+            df["municipio_normalizado"]
+            .str.contains(nome_normalizado)
+        ]
+
         return resultado.to_dict(orient="records")
 
     return df.to_dict(orient="records")
@@ -39,7 +45,12 @@ def get_ranking_densidade(top_n: int = 10):
 
 @app.get("/cidades/{nome}")
 def get_cidade(nome: str):
-    resultado = df[df["municipio"].str.lower() == nome.lower()]
+    nome_normalizado = normalizar_texto(nome)
+
+    resultado = df[
+        df["municipio_normalizado"]
+        .str.contains(nome_normalizado)
+    ]
 
     if resultado.empty:
         raise HTTPException(status_code=404, detail="Cidade não encontrada")

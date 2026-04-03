@@ -1,8 +1,18 @@
 import pandas as pd
 from pathlib import Path
+import unicodedata
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_DIR / "data" / "dados_ibge_pr.xlsx"
+
+
+def normalizar_texto(texto: str) -> str:
+    return (
+        unicodedata.normalize("NFKD", texto)
+        .encode("ASCII", "ignore")
+        .decode("ASCII")
+        .lower()
+    )
 
 
 def load_data() -> pd.DataFrame:
@@ -22,6 +32,8 @@ def load_data() -> pd.DataFrame:
 
     df = df[['municipio', 'area_km2', 'populacao', 'densidade', 'pib_per_capita', 'idhm']]
 
+    df["municipio"] = df["municipio"] = df["municipio"].str.strip()
+    df["municipio_normalizado"] = df["municipio"].apply(normalizar_texto)
     df['area_km2'] = pd.to_numeric(df['area_km2'], errors='coerce')
     df['populacao'] = pd.to_numeric(df['populacao'], errors='coerce')
     df['densidade'] = pd.to_numeric(df['densidade'], errors='coerce')
