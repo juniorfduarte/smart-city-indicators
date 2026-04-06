@@ -1,16 +1,21 @@
 from fastapi import FastAPI
-from src.data_loader import load_data, normalizar_texto
+from src.data_loader import load_data
+from src.utils import normalizar_texto
 from src.indicators import ranking_pib, ranking_idhm, ranking_densidade
 from fastapi import HTTPException
+from src.IBGE_data_loarder import IBGEDataLoader
 
 app = FastAPI()
 
 df = load_data()
 
+loader = IBGEDataLoader()
+
 
 @app.get("/")
 def root():
-    return {"message": "Smart Cities API está rodando 🚀 \n Desenvolvido por: Francisco Junior"}
+    return {"message": "Smart Cities API está rodando 🚀 "
+                       "Desenvolvido por: Francisco Junior"}
 
 
 @app.get("/cidades")
@@ -56,3 +61,26 @@ def get_cidade(nome: str):
         raise HTTPException(status_code=404, detail="Cidade não encontrada")
 
     return resultado.to_dict(orient="records")[0]
+
+
+@app.get("/ibge/pr/municipios/{id}")
+def get_ibge_pr_municipios(id: int):
+    # id de maringá: 4115200
+
+    try:
+        resultado = loader.get_municipio_por_id(id)
+        print(resultado.head())
+        print(resultado.columns)
+
+        return resultado.to_dict(orient="records")
+
+    except Exception as e:
+        print("ERRO:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/ibge/pr/municipios")
+def get_ibge_pr_municipios():
+    resultado = loader.get_municipios_por_estado("PR")
+
+    return resultado.fillna("").to_dict(orient="records")
