@@ -53,7 +53,15 @@ smart-city-indicators/
 
 ## 🚀 Como executar o projeto
 
-### 1. Crie um ambiente virtual (recomendado)
+### 1. Atualizar os requirements.txt
+
+```
+pip freeze > requirements.txt
+```
+
+---
+
+### 2. Crie um ambiente virtual (recomendado)
 
 ```
 python -m venv venv
@@ -62,7 +70,7 @@ venv\Scripts\activate   # Windows
 
 ---
 
-### 2. Instale as dependências
+### 3. Instale as dependências
 
 ```
 pip install -r requirements.txt
@@ -70,7 +78,7 @@ pip install -r requirements.txt
 
 ---
 
-### 3. Execute a API
+### 4. Execute a API
 
 ```
 uvicorn src.api:app --reload
