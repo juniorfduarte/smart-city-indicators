@@ -88,6 +88,14 @@ uvicorn src.api:app --reload
 
 ## 🌐 Acessando a aplicação
 
+### Aplicação em Produção:
+A aplicação está hospetada e acessível nos links abaixo:
+* URL base:
+  https://smart-city-indicators.onrender.com
+* URL de endpoints/docs:
+  https://smart-city-indicators.onrender.com/docs
+
+### Rodando Localmente:
 Após iniciar o servidor, acesse:
 
 * API:

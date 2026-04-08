@@ -1,14 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from src.data_loader import load_data
 from src.utils import normalizar_texto
 from src.indicators import ranking_pib, ranking_idhm, ranking_densidade
+from src.maringa_data_loader import load_maringa_data
 from fastapi import HTTPException
 from src.IBGE_data_loarder import IBGEDataLoader
 
 app = FastAPI()
-
 df = load_data()
-
+df_maringa = load_maringa_data()
 loader = IBGEDataLoader()
 
 
@@ -84,3 +84,32 @@ def get_ibge_pr_municipios():
     resultado = loader.get_municipios_por_estado("PR")
 
     return resultado.fillna("").to_dict(orient="records")
+
+
+@app.get("/maringa/indicadores")
+def get_indicadores(
+    bairro: str = Query(None),
+    zona: str = Query(None)
+):
+    resultado = df_maringa.copy()
+
+    if bairro:
+        resultado = resultado[resultado["Bairro"].str.lower() == bairro.lower()]
+
+    if zona:
+        resultado = resultado[resultado["Zona"].str.lower() == zona.lower()]
+
+    return resultado.to_dict(orient="records")
+
+
+@app.get("/maringa/indicadores/bairro")
+def indicadores_por_bairro():
+
+    resultado = (
+        df_maringa.groupby("Bairro")[["SCORE", "IQU", "IIU", "IAI"]]
+        .mean()
+        .reset_index()
+        .sort_values(by="SCORE", ascending=False)
+    )
+
+    return resultado.to_dict(orient="records")
