@@ -88,28 +88,35 @@ def get_ibge_pr_municipios():
 
 @app.get("/maringa/indicadores")
 def get_indicadores(
-    bairro: str = Query(None),
-    zona: str = Query(None)
+        bairro: str = Query(None),
+        zona: str = Query(None)
 ):
     resultado = df_maringa.copy()
 
     if bairro:
-        resultado = resultado[resultado["Bairro"].str.lower() == bairro.lower()]
+        resultado = resultado[resultado["bairro"].str.lower() == bairro.lower()]
 
     if zona:
-        resultado = resultado[resultado["Zona"].str.lower() == zona.lower()]
+        resultado = resultado[resultado["zona"].str.lower() == zona.lower()]
 
     return resultado.to_dict(orient="records")
 
 
 @app.get("/maringa/indicadores/bairro")
 def indicadores_por_bairro():
-
     resultado = (
-        df_maringa.groupby("Bairro")[["SCORE", "IQU", "IIU", "IAI"]]
+        df_maringa.groupby("bairro")[[
+            "smart_city_score",
+            "indice_qualidade_urbana",
+            "indice_infraestrutura_urbana",
+            "indice_adensamento_inteligente"
+        ]]
         .mean()
         .reset_index()
-        .sort_values(by="SCORE", ascending=False)
+        .sort_values(by="smart_city_score", ascending=False)
     )
 
     return resultado.to_dict(orient="records")
+
+
+print(indicadores_por_bairro())
