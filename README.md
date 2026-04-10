@@ -78,10 +78,18 @@ pip install -r requirements.txt
 
 ---
 
-### 4. Execute a API
+### 4. Execute a API localmente (Back-end)
 
 ```
 uvicorn src.api:app --reload
+```
+
+---
+
+### 5. Executar o dashboard localmente (Front-end)
+
+```
+streamlit run dashboard/app.py
 ```
 
 ---

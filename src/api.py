@@ -117,6 +117,3 @@ def indicadores_por_bairro():
     )
 
     return resultado.to_dict(orient="records")
-
-
-print(indicadores_por_bairro())
