@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: smart-city-indicators
+Version: 0.1.0
+Summary: Smart City Indicators MVP
+Author: Francisco Junior
+Requires-Dist: pandas
+Requires-Dist: openpyxl
+Requires-Dist: streamlit

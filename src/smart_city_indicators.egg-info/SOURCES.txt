@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/IBGE_data_loarder.py
+src/api.py
+src/data_loader.py
+src/indicators.py
+src/main.py
+src/maringa_data_loader.py
+src/utils.py
+src/smart_city_indicators.egg-info/PKG-INFO
+src/smart_city_indicators.egg-info/SOURCES.txt
+src/smart_city_indicators.egg-info/dependency_links.txt
+src/smart_city_indicators.egg-info/requires.txt
+src/smart_city_indicators.egg-info/top_level.txt

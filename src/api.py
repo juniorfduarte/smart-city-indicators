@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Query
+from starlette.middleware.cors import CORSMiddleware
 from src.data_loader import load_data
 from src.utils import normalizar_texto
 from src.indicators import ranking_pib, ranking_idhm, ranking_densidade
@@ -6,7 +7,23 @@ from src.maringa_data_loader import load_maringa_data
 from fastapi import HTTPException
 from src.IBGE_data_loarder import IBGEDataLoader
 
-app = FastAPI()
+
+app = FastAPI(
+    title="Smart City API",
+    description="""
+API de indicadores urbanos. Desenvolvido por Francisco Junior
+
+🔗 Frontend: https://smart-city-indicators-frontend.onrender.com/
+"""
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Ponto para adicioanr retrições futuras
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 df = load_data()
 df_maringa = load_maringa_data()
 loader = IBGEDataLoader()
@@ -16,6 +33,11 @@ loader = IBGEDataLoader()
 def root():
     return {"message": "Smart Cities API está rodando 🚀 "
                        "Desenvolvido por: Francisco Junior"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.get("/cidades")

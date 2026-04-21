@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 import requests
+import os
 
-# API_URL = "http://127.0.0.1:8000/maringa/indicadores"
-API_URL = "https://smart-city-indicators.onrender.com/maringa/indicadores"
+
+BASE_API_URL = os.getenv("API_URL", "http://localhost:8000")
+
+API_URL = f"{BASE_API_URL}/maringa/indicadores"
 
 st.set_page_config(page_title="Smart City Dashboard", layout="wide")
 
