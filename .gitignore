@@ -1,0 +1,10 @@
+# Python bytecode (arquivos fantasmas que apareceram no seu status)
+**/__pycache__/
+*.pyc
+
+# Configurações da IDE (pasta .idea)
+.idea/
+
+# Ambientes virtuais
+venv/
+.env/
