@@ -35,9 +35,8 @@ def root():
                        "Desenvolvido por: Francisco Junior"}
 
 
-@app.head("/health")
+@app.get("/health")
 def health():
-    print("App is healthy.")
     return {"status": "ok"}
 
 
