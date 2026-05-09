@@ -1,10 +1,18 @@
-# Python bytecode (arquivos fantasmas que apareceram no seu status)
+# Python
 **/__pycache__/
 *.pyc
-
-# Configurações da IDE (pasta .idea)
-.idea/
-
-# Ambientes virtuais
 venv/
-.env/
+
+# IDEs
+.idea/
+.vscode/
+
+# Node / React
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Variáveis de ambiente (raiz)
+.env
+.env.local
