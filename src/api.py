@@ -1,141 +1,164 @@
-from fastapi import FastAPI, Query
+import logging
+from contextlib import asynccontextmanager
+from typing import Annotated
+
+import pandas as pd
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from starlette.middleware.cors import CORSMiddleware
+
+from src.config import CORS_ORIGINS
 from src.data_loader import load_data
-from src.utils import normalizar_texto
-from src.indicators import ranking_pib, ranking_idhm, ranking_densidade
+from src.ibge_data_loader import IBGEDataLoader
+from src.indicators import ranking_densidade, ranking_idhm, ranking_pib
 from src.maringa_data_loader import load_maringa_data
-from fastapi import HTTPException
-from src.IBGE_data_loarder import IBGEDataLoader
+from src.utils import normalizar_texto
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Carregando dados...")
+    app.state.df = load_data()
+    app.state.df_maringa = load_maringa_data()
+    app.state.ibge_loader = IBGEDataLoader()
+    logger.info("Dados carregados com sucesso.")
+    yield
+    logger.info("Encerrando aplicação.")
 
 
 app = FastAPI(
-    title="Smart City API",
-    description="""
-API de indicadores urbanos. Desenvolvido por Francisco Junior
-
-🔗 Frontend: https://smart-city-indicators-frontend.onrender.com/
-"""
+    title="Smart City Indicators API",
+    description="API de indicadores urbanos para Maringá-PR. Desenvolvido por Francisco Junior.",
+    version="1.0.0",
+    lifespan=lifespan,
 )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ponto para adicioanr retrições futuras
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 
-df = load_data()
-df_maringa = load_maringa_data()
-loader = IBGEDataLoader()
+
+def get_df(request: Request) -> pd.DataFrame:
+    return request.app.state.df
+
+
+def get_maringa_df(request: Request) -> pd.DataFrame:
+    return request.app.state.df_maringa
+
+
+def get_ibge_loader(request: Request) -> IBGEDataLoader:
+    return request.app.state.ibge_loader
+
+
+DfDep = Annotated[pd.DataFrame, Depends(get_df)]
+MaringaDfDep = Annotated[pd.DataFrame, Depends(get_maringa_df)]
+IBGELoaderDep = Annotated[IBGEDataLoader, Depends(get_ibge_loader)]
 
 
 @app.get("/")
-def root():
-    return {"message": "Smart Cities API está rodando 🚀 "
-                       "Desenvolvido por: Francisco Junior"}
+def root() -> dict:
+    return {"message": "Smart City Indicators API", "docs": "/docs"}
 
 
 @app.get("/health")
-def health():
+def health() -> dict:
     return {"status": "ok"}
 
 
 @app.get("/cidades")
-def get_cidades(nome: str = None):
+def get_cidades(
+    df: DfDep,
+    nome: str | None = Query(None, min_length=2, max_length=100),
+) -> list[dict]:
     if nome:
-        nome_normalizado = normalizar_texto(nome)
-
-        resultado = df[
-            df["municipio_normalizado"]
-            .str.contains(nome_normalizado)
-        ]
-
-        return resultado.to_dict(orient="records")
-
+        nome_norm = normalizar_texto(nome)
+        result = df[df["municipio_normalizado"].str.contains(nome_norm, na=False)]
+        return result.to_dict(orient="records")
     return df.to_dict(orient="records")
 
 
+@app.get("/cidades/{nome}")
+def get_cidade(nome: str, df: DfDep) -> dict:
+    nome_norm = normalizar_texto(nome)
+    result = df[df["municipio_normalizado"].str.contains(nome_norm, na=False)]
+    if result.empty:
+        raise HTTPException(status_code=404, detail="Cidade não encontrada")
+    return result.to_dict(orient="records")[0]
+
+
 @app.get("/ranking/pib")
-def get_ranking_pib(top_n: int = 10):
+def get_ranking_pib(
+    df: DfDep,
+    top_n: int = Query(10, ge=1, le=100),
+) -> list[dict]:
     return ranking_pib(df, top_n)
 
 
 @app.get("/ranking/idhm")
-def get_ranking_idhm(top_n: int = 10):
+def get_ranking_idhm(
+    df: DfDep,
+    top_n: int = Query(10, ge=1, le=100),
+) -> list[dict]:
     return ranking_idhm(df, top_n)
 
 
 @app.get("/ranking/densidade")
-def get_ranking_densidade(top_n: int = 10):
+def get_ranking_densidade(
+    df: DfDep,
+    top_n: int = Query(10, ge=1, le=100),
+) -> list[dict]:
     return ranking_densidade(df, top_n)
 
 
-@app.get("/cidades/{nome}")
-def get_cidade(nome: str):
-    nome_normalizado = normalizar_texto(nome)
-
-    resultado = df[
-        df["municipio_normalizado"]
-        .str.contains(nome_normalizado)
-    ]
-
-    if resultado.empty:
-        raise HTTPException(status_code=404, detail="Cidade não encontrada")
-
-    return resultado.to_dict(orient="records")[0]
-
-
-@app.get("/ibge/pr/municipios/{id}")
-def get_ibge_pr_municipios(id: int):
-    # id de maringá: 4115200
-
-    try:
-        resultado = loader.get_municipio_por_id(id)
-        print(resultado.head())
-        print(resultado.columns)
-
-        return resultado.to_dict(orient="records")
-
-    except Exception as e:
-        print("ERRO:", e)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.get("/ibge/pr/municipios")
-def get_ibge_pr_municipios():
+def list_ibge_pr_municipios(loader: IBGELoaderDep) -> list[dict]:
     resultado = loader.get_municipios_por_estado("PR")
-
     return resultado.fillna("").to_dict(orient="records")
+
+
+@app.get("/ibge/pr/municipios/{municipio_id}")
+def get_ibge_pr_municipio(municipio_id: int, loader: IBGELoaderDep) -> list[dict]:
+    try:
+        resultado = loader.get_municipio_por_id(municipio_id)
+        return resultado.to_dict(orient="records")
+    except RuntimeError:
+        raise HTTPException(status_code=502, detail="Erro ao consultar API do IBGE")
 
 
 @app.get("/maringa/indicadores")
 def get_indicadores(
-        bairro: str = Query(None),
-        zona: str = Query(None)
-):
-    resultado = df_maringa.copy()
-
+    df_maringa: MaringaDfDep,
+    bairro: str | None = Query(None, max_length=100),
+    zona: str | None = Query(None, max_length=50),
+) -> list[dict]:
+    result = df_maringa.copy()
     if bairro:
-        resultado = resultado[resultado["bairro"].str.lower() == bairro.lower()]
-
+        result = result[result["bairro"].str.lower() == bairro.lower()]
     if zona:
-        resultado = resultado[resultado["zona"].str.lower() == zona.lower()]
-
-    return resultado.to_dict(orient="records")
+        result = result[result["zona"].str.lower() == zona.lower()]
+    return result.to_dict(orient="records")
 
 
 @app.get("/maringa/indicadores/bairro")
-def indicadores_por_bairro():
-    resultado = (
+def indicadores_por_bairro(df_maringa: MaringaDfDep) -> list[dict]:
+    result = (
         df_maringa.groupby("bairro")[[
             "smart_city_score",
             "indice_qualidade_urbana",
             "indice_infraestrutura_urbana",
-            "indice_adensamento_inteligente"
+            "indice_adensamento_inteligente",
         ]]
         .mean()
         .reset_index()
         .sort_values(by="smart_city_score", ascending=False)
     )
-
-    return resultado.to_dict(orient="records")
+    return result.to_dict(orient="records")
