@@ -8,7 +8,3 @@ def normalizar_texto(texto: str) -> str:
         .decode("ASCII")
         .lower()
     )
-
-
-def space():
-    print("------------------------------------------------------------------------------")

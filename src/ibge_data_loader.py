@@ -1,42 +1,35 @@
-import requests
+import logging
+
 import pandas as pd
-from src.utils import space
+import requests
+
+logger = logging.getLogger(__name__)
 
 
 class IBGEDataLoader:
     BASE_URL = "https://servicodados.ibge.gov.br/api/v1/localidades"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = requests.Session()
 
     def _get(self, endpoint: str) -> list:
         url = f"{self.BASE_URL}/{endpoint}"
-
         try:
-            response = self.session.get(url)
+            response = self.session.get(url, timeout=10)
             response.raise_for_status()
             return response.json()
-
         except requests.RequestException as e:
-            raise RuntimeError(f"Erro ao acessar IBGE: {e}")
+            logger.error("Erro ao acessar IBGE API: %s", e)
+            raise RuntimeError(f"Erro ao acessar IBGE: {e}") from e
 
     def get_estados(self) -> pd.DataFrame:
-        data = self._get("estados")
-        return pd.DataFrame(data)
+        return pd.DataFrame(self._get("estados"))
 
     def get_municipios(self) -> pd.DataFrame:
-        data = self._get("municipios")
-        return pd.DataFrame(data)
+        return pd.DataFrame(self._get("municipios"))
 
     def get_municipios_por_estado(self, uf: str) -> pd.DataFrame:
-        data = self._get(f"estados/{uf}/municipios")
-        # df = pd.DataFrame(data)
-        # df["municipio"] = df["nome"]
-        df = pd.json_normalize(data)
-
-        return df
+        return pd.json_normalize(self._get(f"estados/{uf}/municipios"))
 
     def get_municipio_por_id(self, municipio_id: int) -> pd.DataFrame:
-        data = self._get(f"municipios/{municipio_id}")
-        return pd.DataFrame([data])
-
+        return pd.DataFrame([self._get(f"municipios/{municipio_id}")])

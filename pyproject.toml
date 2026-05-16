@@ -1,0 +1,14 @@
+[project]
+name = "smart-city-indicators"
+version = "0.1.0"
+description = "API de indicadores urbanos para Maringá-PR"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Francisco Junior", email = "junior.fduarte@gmail.com" }
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
