@@ -5,7 +5,7 @@ import {
   ScatterChart, Scatter, CartesianGrid
 } from "recharts";
 
-const API = "https://smart-city-indicators.onrender.com";
+const API = "https://smart-city-indicators-api.onrender.com";
 
 const COR = {
   verde:  "#1D9E75",
