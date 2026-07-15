@@ -114,14 +114,18 @@ Execute novamente com --build apenas se:
 
 ### 🥈 Opção 2 — Rodar localmente (sem Docker)
 
+Requer Python 3.11 (versão pinada em `.python-version`).
+
 1. Criar ambiente virtual
 ```
-python -m venv venv
-venv\Scripts\activate   # Windows
+python3.11 -m venv venv
+source venv/bin/activate   # macOS/Linux
+venv\Scripts\activate      # Windows
 ```
 2. Instalar dependências
 ```
 pip install -r requirements.txt
+pip install -r requirements-dev.txt   # opcional, para rodar testes/lint
 ```
 3. Rodar API
 ```
@@ -131,6 +135,11 @@ uvicorn src.api:app --reload
 4. Rodar Frontend:
 ```
 streamlit run dashboard/app.py
+```
+
+5. Rodar testes
+```
+pytest
 ```
 
 ---
