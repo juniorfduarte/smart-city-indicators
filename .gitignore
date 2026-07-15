@@ -17,3 +17,6 @@ node_modules/
 # Variáveis de ambiente (raiz)
 .env
 .env.local
+
+# Dados brutos do Censo 2022 (arquivos nacionais grandes, baixados sob demanda — ver Notion "Projeto Paralelo")
+data/raw/
