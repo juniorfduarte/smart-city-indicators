@@ -7,6 +7,9 @@ venv/
 .idea/
 .vscode/
 
+# Claude Code (config/permissões locais — não versionar em repo público)
+.claude/
+
 # Node / React
 frontend/node_modules/
 frontend/dist/
