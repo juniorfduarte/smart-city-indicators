@@ -8,12 +8,16 @@ from src.censo_urbano.config import CD_MUN_MARINGA
 def carregar_malha_setores(caminho: Path, cd_mun: str = CD_MUN_MARINGA) -> gpd.GeoDataFrame:
     """Geometria dos setores censitários de um município.
 
-    CD_FCU vem pronto no arquivo (aglomerado subnormal) — em Maringá está vazio
-    ("." ) para todos os setores, ver spec §6.2 (atualização 2026-07-16): não há
-    aglomerado subnormal delimitado pelo IBGE na cidade, não precisa de
-    cruzamento espacial com uma malha separada de favelas.
+    Só CD_SETOR + geometry: o export real de Maringá (malha_maringa.gpkg) não
+    traz CD_MUN nem atributos (SITUACAO, CD_FCU) — já vem pré-filtrado para o
+    município. Se o arquivo tiver CD_MUN (ex.: extração de um estado inteiro),
+    filtra por ele; caso contrário assume que já está filtrado.
+
+    CD_FCU (aglomerado subnormal) não vem mais desta malha: já está disponível
+    em `censo_repository.carregar_setores` via o arquivo básico (mesma fonte,
+    sem precisar de um segundo cruzamento espacial — ver iua_service.py).
     """
     gdf = gpd.read_file(caminho)
-    gdf["CD_MUN"] = gdf["CD_MUN"].astype(str)
-    gdf = gdf[gdf["CD_MUN"] == cd_mun].reset_index(drop=True)
-    return gdf[["CD_SETOR", "SITUACAO", "CD_FCU", "geometry"]]
+    if "CD_MUN" in gdf.columns:
+        gdf = gdf[gdf["CD_MUN"].astype(str) == cd_mun].reset_index(drop=True)
+    return gdf[["CD_SETOR", "geometry"]]

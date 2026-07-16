@@ -4,7 +4,19 @@ Unidade dos indicadores: DOMICÍLIOS (decisão de 2026-07-15, resolve a
 divergência entre §6.2 e §10 do spec "Índice Urbano v1").
 """
 
+from pathlib import Path
+
 UNIVERSO_PADRAO = "maringa"
+
+# --- Caminhos dos dados reais (gitignored, ver data/raw/ no .gitignore) ---
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DATA_DIR_MARINGA = BASE_DIR / "data" / "raw" / "censo2022" / "maringa"
+BASICO_PATH = DATA_DIR_MARINGA / "basico_maringa.csv"
+DOMICILIO1_PATH = DATA_DIR_MARINGA / "domicilio1_maringa.csv"
+DOMICILIO2_PATH = DATA_DIR_MARINGA / "domicilio2_maringa.csv"
+DOMICILIO3_PATH = DATA_DIR_MARINGA / "domicilio3_maringa.csv"
+MALHA_PATH = DATA_DIR_MARINGA / "malha_maringa.gpkg"
 
 # Confirmado em 2026-07-16 diretamente nos dados oficiais (coluna CD_MUN)
 CD_MUN_MARINGA = "4115200"
@@ -12,7 +24,9 @@ CD_MUN_MARINGA = "4115200"
 # Denominador genérico de "total de domicílios do setor" (esgoto, lixo): decisão de
 # 2026-07-16 — Domicílios Particulares Ocupados, exclui vagos/uso ocasional (sem
 # morador para ter condição de esgoto/lixo avaliada).
-TOTAL_DOMICILIOS_V0007 = "V0007"
+# Vem do arquivo "básico" (não domicilio1/2/3): lá a coluna é minúscula, ao
+# contrário dos códigos V00XXX dos arquivos de característica do domicílio.
+TOTAL_DOMICILIOS_V0007 = "v0007"
 
 # --- Pesos por dimensão (redistribuídos — indicadores N/A no Censo 2022 excluídos) ---
 
@@ -44,7 +58,7 @@ LIXO_ADEQUADO_V00XXX = ["V00397", "V00398"]  # coletado por serviço de limpeza 
 # cômodos/cortiço, habitação indígena, estrutura degradada = inadequado (V00050-052).
 # Confirmado em 2026-07-16 contra o Dicionário oficial (descrições exatas por variável).
 ESPECIE_ADEQUADA_V00XXX = ["V00047", "V00048", "V00049"]
-ESPECIE_TOTAL_V00XXX = [f"V00{n}" for n in range(47, 53)]
+ESPECIE_TOTAL_V00XXX = [f"V{n:05d}" for n in range(47, 53)]  # V00047..V00052
 
 # Faixas de banheiro: domicílios em domicilio2 (V00232-238), moradores em domicilio3
 # (V00552-558) — mesma ordem em ambos os arquivos, confirmado em 2026-07-16 contra o

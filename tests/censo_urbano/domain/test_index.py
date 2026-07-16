@@ -12,6 +12,19 @@ class TestCalcularSemDado:
         assert result.iloc[0]
         assert not result.iloc[1]
 
+    def test_setor_com_menos_de_cinco_domicilios_e_sem_dado(self):
+        # Limiar oficial do IBGE: setores com < 5 domicílios têm quase tudo suprimido.
+        total = pd.Series([1.0, 4.0])
+        result = calcular_sem_dado(total)
+        assert result.iloc[0]
+        assert result.iloc[1]
+
+    def test_setor_com_cinco_ou_mais_domicilios_nao_e_sem_dado(self):
+        total = pd.Series([5.0, 100.0])
+        result = calcular_sem_dado(total)
+        assert not result.iloc[0]
+        assert not result.iloc[1]
+
 
 class TestCalcularIua:
     def test_media_simples_d3_d4(self):

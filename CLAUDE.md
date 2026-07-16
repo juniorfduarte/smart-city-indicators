@@ -24,14 +24,20 @@ não estiver disponível, pergunte ao usuário.
 
 **Fluxo de trabalho combinado com o usuário:** o Claude executa as tasks (código, testes), mas commit e push ficam **sempre** por conta do usuário — nunca rodar `git commit`/`git push` neste track sem pedido explícito.
 
-### Status (atualizado 2026-07-16)
+### Status (atualizado 2026-07-15)
 
-- ✅ Fase 1 (domain — cálculo puro) e Fase 2 (repositories — I/O real) implementadas, testadas e mergeadas em `master`.
+- ✅ Fase 1 (domain — cálculo puro), Fase 2 (repositories — I/O real) e Fase 3 (schemas/service/router) implementadas e testadas. Commit/push ainda não feitos (por conta do usuário).
 - Dados reais do Censo 2022 baixados em `data/raw/censo2022/` (gitignored, ~228MB) + recorte filtrado para Maringá em `data/raw/censo2022/maringa/` (~3MB, `CD_MUN=4115200`, 793 setores).
 - `geopandas==1.1.4` no requirements.txt (só para `malha_repository.py`).
-- Suíte completa: 73 testes passando.
-- **Próximo passo: Fase 3** — `schemas/setor.py` (Pydantic), `services/iua_service.py`, `api/router.py`.
-- **Decisão pendente para a Fase 3:** o Censo usa `"X"` como marcador de sigilo estatístico em células individuais (não só em setores sem domicílios). Indicadores que somam múltiplas variáveis (água = 8 variáveis, espécie = 3) precisam decidir como tratar uma célula suprimida dentro da soma — provável: tratar como 0 (`skipna=True`), documentando como desvio consciente. Ver addendum na página "Spec" do Notion (2026-07-16) para os 25 setores reais afetados.
+- Suíte completa: 82 testes passando.
+- **Fase 3 implementada e revisada (code review multi-agente):** `schemas/setor.py` (`SetorIUA`), `services/iua_service.py` (`calcular_iua_setores(df_setores)` — orquestra repositories + domain, trata sigilo em soma como 0 e "não aglomerado subnormal" via `CD_FCU`, que vem do arquivo básico já dentro de `df_setores`), `api/router.py` (`GET /iua/setores`, `GET /iua/setores/{cd_setor}`, via `APIRouter` isolado, não montado ainda no app principal `src/api.py`). **Validado ponta a ponta contra os 793 setores reais de Maringá** (22 sem_dado, IUA médio ~0.96).
+- **Decisão confirmada (sigilo estatístico), com fonte oficial:** célula `"X"` é tratada como 0 (`fillna(0)`), aplicado uniformemente a todos os indicadores (não só somas multivariáveis). Confirmado contra o PDF oficial do IBGE ("Agregados por Setores Censitários: Resultados do universo", slide 13, "Tratamento de sigilo"): a supressão só ocorre quando o **valor da própria célula** é 1 ou 2 ("deve ser evitada a divulgação de células com frequências iguais a 1 ou 2") — nunca por causa do complemento/total. Ou seja, "X" sempre significa "valor pequeno" (1 ou 2), então tratar como 0 introduz um erro máximo de 1-2 domicílios por célula, aceitável em qualquer setor não-sem_dado.
+- **Limiar de `sem_dado` corrigido para bater com a metodologia oficial do IBGE:** o mesmo PDF (slide 13) diz que setores com **menos de 5 domicílios particulares permanentes** têm a maioria das variáveis omitida (só ficam identificação geográfica, número de domicílios e população). `calcular_sem_dado` (domain/index.py) mudou de `total_domicilios == 0` para `total_domicilios < 5`. Também adicionada uma máscara explícita de `sem_dado` sobre d3/d4/iua em `iua_service.py`, porque esgoto/lixo/densidade de banheiro usam o total de domicílios externo (sempre > 0 para 1-4 domicílios) como denominador e não ficavam NaN sozinhos por propagação — só água/espécie (que têm denominador somado internamente) ficavam NaN "por acaso". Validado contra os 793 setores reais: sem_dado subiu de 22 (limiar antigo) para 32 (limiar novo), estatísticas de IUA idênticas (confirma que os 10 setores adicionais já estavam silenciosamente NaN).
+- **Bugs corrigidos na revisão (pré-existentes, Fase 1/2, expostos agora porque Fase 3 é o primeiro consumidor real):**
+  - `ESPECIE_TOTAL_V00XXX` em `config.py` gerava códigos errados (`V0047` em vez de `V00047`).
+  - `TOTAL_DOMICILIOS_V0007` apontava para uma coluna inexistente (`"V0007"`) — a coluna real do arquivo básico é `"v0007"` minúsculo.
+  - `malha_repository.carregar_malha_setores` esperava `CD_MUN`/`SITUACAO`/`CD_FCU` no `.gpkg`, mas o arquivo real de Maringá só tem `CD_SETOR` + `geometry`. Corrigido simplificando a malha para só geometria (o `CD_FCU` já vem do arquivo básico, via `df_setores`) — `calcular_iua_setores` não recebe mais `df_malha`.
+- **Pendente:** (1) decisão sobre o escopo do "X como 0" acima; (2) decidir se/quando montar `api/router.py` no app principal (`src/api.py`, `include_router` + carregar dados reais no `lifespan`) — não fiz isso ainda por ser uma integração com Track A que merece confirmação explícita.
 
 ## Padrões de código já estabelecidos
 
