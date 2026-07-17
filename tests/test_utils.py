@@ -1,5 +1,3 @@
-import pytest
-
 from src.utils import normalizar_texto
 
 

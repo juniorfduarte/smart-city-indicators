@@ -105,7 +105,9 @@ class TestCalcularIuaSetores:
         assert pd.isna(linha["d4"])
         assert pd.isna(linha["iua"])
 
-    def test_setor_com_menos_de_cinco_domicilios_e_sem_dado_mesmo_sem_supressao(self, df_dois_setores):
+    def test_setor_com_menos_de_cinco_domicilios_e_sem_dado_mesmo_sem_supressao(
+        self, df_dois_setores
+    ):
         # v0007=3 (< 5 => sem_dado pelo limiar oficial do IBGE), mas com variáveis
         # preenchidas normalmente — prova que a máscara explícita de sem_dado
         # funciona mesmo quando os indicadores dariam um número real (esgoto,

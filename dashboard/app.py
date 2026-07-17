@@ -1,8 +1,8 @@
-import streamlit as st
-import pandas as pd
-import requests
 import os
 
+import pandas as pd
+import requests
+import streamlit as st
 
 BASE_API_URL = os.getenv("API_URL", "http://localhost:8000")
 

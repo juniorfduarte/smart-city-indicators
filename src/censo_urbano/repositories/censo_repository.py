@@ -32,7 +32,7 @@ def ler_domicilio2(caminho: Path) -> pd.DataFrame:
 
 
 def ler_domicilio3(caminho: Path) -> pd.DataFrame:
-    """Características do domicílio, parte 3 (V00496-643, inclui moradores por faixa de banheiro)."""
+    """Características do domicílio, parte 3 (V00496-643, moradores por faixa de banheiro)."""
     return _ler_csv_censo(caminho, "setor")
 
 

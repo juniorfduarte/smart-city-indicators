@@ -5,8 +5,8 @@ from src.censo_urbano.domain.indicators import (
     FaixaBanheiro,
     prop_agua,
     prop_densidade_banheiro,
-    prop_especie_adequada,
     prop_esgoto,
+    prop_especie_adequada,
     prop_lixo,
 )
 

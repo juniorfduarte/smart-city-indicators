@@ -1,3 +1,5 @@
+from typing import cast
+
 import pandas as pd
 
 from src.censo_urbano.config import (
@@ -16,8 +18,8 @@ from src.censo_urbano.domain.indicators import (
     FaixaBanheiro,
     prop_agua,
     prop_densidade_banheiro,
-    prop_especie_adequada,
     prop_esgoto,
+    prop_especie_adequada,
     prop_lixo,
 )
 from src.censo_urbano.domain.normalization import normalizar
@@ -35,10 +37,10 @@ def _soma_variaveis(df: pd.DataFrame, colunas: list[str]) -> pd.Series:
 def _montar_faixas_banheiro(df: pd.DataFrame) -> list[FaixaBanheiro]:
     return [
         FaixaBanheiro(
-            nome=faixa["nome"],
+            nome=cast(str, faixa["nome"]),
             domicilios=df[faixa["domicilios_v00xxx"]].fillna(0),
             moradores=df[faixa["moradores_v00xxx"]].fillna(0),
-            num_banheiros=faixa["num_banheiros"],
+            num_banheiros=cast("int | None", faixa["num_banheiros"]),
         )
         for faixa in FAIXAS_BANHEIRO
     ]

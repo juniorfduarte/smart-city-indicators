@@ -149,8 +149,8 @@ def get_ibge_pr_municipio(municipio_id: int, loader: IBGELoaderDep) -> list[dict
     try:
         resultado = loader.get_municipio_por_id(municipio_id)
         return resultado.to_dict(orient="records")
-    except RuntimeError:
-        raise HTTPException(status_code=502, detail="Erro ao consultar API do IBGE")
+    except RuntimeError as err:
+        raise HTTPException(status_code=502, detail="Erro ao consultar API do IBGE") from err
 
 
 @app.get("/maringa/indicadores")

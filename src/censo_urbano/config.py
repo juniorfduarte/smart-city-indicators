@@ -52,7 +52,7 @@ AGUA_TOTAL_V00XXX = [f"V00{n}" for n in range(111, 119)]  # todas as formas de a
 
 ESGOTO_ADEQUADO_V00XXX = ["V00309"]  # rede geral ou pluvial
 
-LIXO_ADEQUADO_V00XXX = ["V00397", "V00398"]  # coletado por serviço de limpeza + depositado em caçamba
+LIXO_ADEQUADO_V00XXX = ["V00397", "V00398"]  # coletado por limpeza + depositado em caçamba
 
 # casa, casa de vila/condomínio, apartamento = adequado (V00047-049);
 # cômodos/cortiço, habitação indígena, estrutura degradada = inadequado (V00050-052).
@@ -63,14 +63,49 @@ ESPECIE_TOTAL_V00XXX = [f"V{n:05d}" for n in range(47, 53)]  # V00047..V00052
 # Faixas de banheiro: domicílios em domicilio2 (V00232-238), moradores em domicilio3
 # (V00552-558) — mesma ordem em ambos os arquivos, confirmado em 2026-07-16 contra o
 # Dicionário oficial: 1, 2, 3, 4+, comum, sanitário/buraco, nenhum.
-FAIXAS_BANHEIRO = [
-    {"nome": "1_banheiro", "num_banheiros": 1, "domicilios_v00xxx": "V00232", "moradores_v00xxx": "V00552"},
-    {"nome": "2_banheiros", "num_banheiros": 2, "domicilios_v00xxx": "V00233", "moradores_v00xxx": "V00553"},
-    {"nome": "3_banheiros", "num_banheiros": 3, "domicilios_v00xxx": "V00234", "moradores_v00xxx": "V00554"},
-    {"nome": "4_mais_banheiros", "num_banheiros": 4, "domicilios_v00xxx": "V00235", "moradores_v00xxx": "V00555"},
-    {"nome": "comum", "num_banheiros": None, "domicilios_v00xxx": "V00236", "moradores_v00xxx": "V00556"},
-    {"nome": "sanitario_buraco", "num_banheiros": None, "domicilios_v00xxx": "V00237", "moradores_v00xxx": "V00557"},
-    {"nome": "nenhum", "num_banheiros": None, "domicilios_v00xxx": "V00238", "moradores_v00xxx": "V00558"},
+FAIXAS_BANHEIRO: list[dict[str, str | int | None]] = [
+    {
+        "nome": "1_banheiro",
+        "num_banheiros": 1,
+        "domicilios_v00xxx": "V00232",
+        "moradores_v00xxx": "V00552",
+    },
+    {
+        "nome": "2_banheiros",
+        "num_banheiros": 2,
+        "domicilios_v00xxx": "V00233",
+        "moradores_v00xxx": "V00553",
+    },
+    {
+        "nome": "3_banheiros",
+        "num_banheiros": 3,
+        "domicilios_v00xxx": "V00234",
+        "moradores_v00xxx": "V00554",
+    },
+    {
+        "nome": "4_mais_banheiros",
+        "num_banheiros": 4,
+        "domicilios_v00xxx": "V00235",
+        "moradores_v00xxx": "V00555",
+    },
+    {
+        "nome": "comum",
+        "num_banheiros": None,
+        "domicilios_v00xxx": "V00236",
+        "moradores_v00xxx": "V00556",
+    },
+    {
+        "nome": "sanitario_buraco",
+        "num_banheiros": None,
+        "domicilios_v00xxx": "V00237",
+        "moradores_v00xxx": "V00557",
+    },
+    {
+        "nome": "nenhum",
+        "num_banheiros": None,
+        "domicilios_v00xxx": "V00238",
+        "moradores_v00xxx": "V00558",
+    },
 ]
 
 # §6.3: piso conservador de nº de banheiros para a faixa "4+"

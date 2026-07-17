@@ -14,7 +14,9 @@ def _prop(domicilios_adequados: pd.Series, total_domicilios: pd.Series) -> pd.Se
     return (domicilios_adequados / total_domicilios).where(total_domicilios != 0)
 
 
-def prop_agua(domicilios_adequados: pd.Series, domicilios_total_abastecimento: pd.Series) -> pd.Series:
+def prop_agua(
+    domicilios_adequados: pd.Series, domicilios_total_abastecimento: pd.Series
+) -> pd.Series:
     return _prop(domicilios_adequados, domicilios_total_abastecimento)
 
 
@@ -26,7 +28,9 @@ def prop_lixo(domicilios_adequados: pd.Series, total_domicilios: pd.Series) -> p
     return _prop(domicilios_adequados, total_domicilios)
 
 
-def prop_especie_adequada(domicilios_adequados: pd.Series, domicilios_total_especie: pd.Series) -> pd.Series:
+def prop_especie_adequada(
+    domicilios_adequados: pd.Series, domicilios_total_especie: pd.Series
+) -> pd.Series:
     return _prop(domicilios_adequados, domicilios_total_especie)
 
 

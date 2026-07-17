@@ -103,22 +103,32 @@ class TestLerDomicilios:
 
 
 class TestCarregarSetores:
-    def test_junta_as_quatro_tabelas(self, basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv):
-        df = carregar_setores(basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv, cd_mun=CD_MUN_TESTE)
+    def test_junta_as_quatro_tabelas(
+        self, basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv
+    ):
+        df = carregar_setores(
+            basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv, cd_mun=CD_MUN_TESTE
+        )
         assert len(df) == 3
         assert {"V00047", "V00111", "V00552"} <= set(df.columns)
 
     def test_setor_sem_domicilios_vira_nan_nas_colunas_de_caracteristicas(
         self, basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv
     ):
-        df = carregar_setores(basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv, cd_mun=CD_MUN_TESTE)
+        df = carregar_setores(
+            basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv, cd_mun=CD_MUN_TESTE
+        )
         setor_vazio = df[df["CD_SETOR"] == "333333333333333"]
         assert setor_vazio["V00047"].isna().all()
         assert setor_vazio["V00111"].isna().all()
         assert setor_vazio["V00552"].isna().all()
 
-    def test_valores_normais_preservados(self, basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv):
-        df = carregar_setores(basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv, cd_mun=CD_MUN_TESTE)
+    def test_valores_normais_preservados(
+        self, basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv
+    ):
+        df = carregar_setores(
+            basico_csv, domicilio1_csv, domicilio2_csv, domicilio3_csv, cd_mun=CD_MUN_TESTE
+        )
         setor = df[df["CD_SETOR"] == "111111111111111"]
         assert setor["V00047"].iloc[0] == 25
         assert setor["V00111"].iloc[0] == 20
