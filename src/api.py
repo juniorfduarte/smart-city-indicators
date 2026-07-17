@@ -6,12 +6,28 @@ import pandas as pd
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from starlette.middleware.cors import CORSMiddleware
 
+from src.censo_urbano.api.router import router as iua_router
+from src.censo_urbano.config import (
+    BASICO_PATH,
+    DOMICILIO1_PATH,
+    DOMICILIO2_PATH,
+    DOMICILIO3_PATH,
+)
+from src.censo_urbano.repositories.censo_repository import carregar_setores
+from src.censo_urbano.services.iua_service import calcular_iua_setores
 from src.config import CORS_ORIGINS
 from src.data_loader import load_data
 from src.ibge_data_loader import IBGEDataLoader
 from src.indicators import ranking_densidade, ranking_idhm, ranking_pib
 from src.maringa_data_loader import load_maringa_data
 from src.utils import normalizar_texto
+
+
+def load_setores_iua() -> pd.DataFrame:
+    df_setores = carregar_setores(
+        BASICO_PATH, DOMICILIO1_PATH, DOMICILIO2_PATH, DOMICILIO3_PATH
+    )
+    return calcular_iua_setores(df_setores)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -26,6 +42,7 @@ async def lifespan(app: FastAPI):
     app.state.df = load_data()
     app.state.df_maringa = load_maringa_data()
     app.state.ibge_loader = IBGEDataLoader()
+    app.state.setores_iua = load_setores_iua()
     logger.info("Dados carregados com sucesso.")
     yield
     logger.info("Encerrando aplicação.")
@@ -45,6 +62,8 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+app.include_router(iua_router)
 
 
 def get_df(request: Request) -> pd.DataFrame:

@@ -28,6 +28,14 @@ MOCK_IBGE_DF = pd.DataFrame({
     "nome": ["Maringá", "Curitiba"],
 })
 
+MOCK_SETORES_IUA_DF = pd.DataFrame({
+    "CD_SETOR": ["111", "222"],
+    "sem_dado": [False, False],
+    "d3": [0.8, 0.4],
+    "d4": [0.6, 0.2],
+    "iua": [0.7, 0.3],
+})
+
 
 @pytest.fixture
 def client():
@@ -38,12 +46,15 @@ def client():
     with (
         patch("src.api.load_data", return_value=MOCK_DF),
         patch("src.api.load_maringa_data", return_value=MOCK_MARINGA_DF),
+        patch("src.api.load_setores_iua", return_value=MOCK_SETORES_IUA_DF),
     ):
         from src.api import app, get_df, get_ibge_loader, get_maringa_df
+        from src.censo_urbano.api.router import get_setores_iua
 
         app.dependency_overrides[get_df] = lambda: MOCK_DF
         app.dependency_overrides[get_maringa_df] = lambda: MOCK_MARINGA_DF
         app.dependency_overrides[get_ibge_loader] = lambda: mock_loader
+        app.dependency_overrides[get_setores_iua] = lambda: MOCK_SETORES_IUA_DF
 
         with TestClient(app) as c:
             yield c
