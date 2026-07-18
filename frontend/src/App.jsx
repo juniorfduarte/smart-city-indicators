@@ -2,6 +2,7 @@ import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Indicadores from "./pages/Indicadores";
+import IUA from "./pages/IUA";
 
 export default function App() {
   const [pagina, setPagina]   = useState("dashboard");
@@ -11,6 +12,7 @@ export default function App() {
     switch (pagina) {
       case "dashboard":   return <Dashboard />;
       case "indicadores": return <Indicadores />;
+      case "iua":          return <IUA />;
       default:            return <Dashboard />;
     }
   };
