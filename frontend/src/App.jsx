@@ -3,6 +3,7 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Indicadores from "./pages/Indicadores";
 import IUA from "./pages/IUA";
+import IUADocumentacao from "./pages/IUADocumentacao";
 
 export default function App() {
   const [pagina, setPagina]   = useState("dashboard");
@@ -13,6 +14,7 @@ export default function App() {
       case "dashboard":   return <Dashboard />;
       case "indicadores": return <Indicadores />;
       case "iua":          return <IUA />;
+      case "iua-doc":      return <IUADocumentacao />;
       default:            return <Dashboard />;
     }
   };

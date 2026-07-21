@@ -2,6 +2,7 @@ const MENU = [
   { id: "dashboard",   label: "Dashboard",    icon: "ti-layout-dashboard" },
   { id: "indicadores", label: "Indicadores",  icon: "ti-file-description" },
   { id: "iua",         label: "IUA",          icon: "ti-chart-histogram" },
+  { id: "iua-doc",     label: "Doc. IUA",     icon: "ti-file-text" },
 ];
 
 export default function Sidebar({ paginaAtiva, setPagina, aberta, setAberta }) {
