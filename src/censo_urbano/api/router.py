@@ -12,7 +12,12 @@ def get_setores_iua(request: Request) -> pd.DataFrame:
     return request.app.state.setores_iua
 
 
+def get_setores_iua_geojson(request: Request) -> dict:
+    return request.app.state.setores_iua_geojson
+
+
 SetoresIUADep = Annotated[pd.DataFrame, Depends(get_setores_iua)]
+SetoresIUAGeoJSONDep = Annotated[dict, Depends(get_setores_iua_geojson)]
 
 
 def _valor_ou_none(valor: float) -> float | None:
@@ -32,6 +37,11 @@ def _linha_para_schema(linha: pd.Series) -> SetorIUA:
 @router.get("/setores")
 def listar_setores(df: SetoresIUADep) -> list[SetorIUA]:
     return [_linha_para_schema(linha) for _, linha in df.iterrows()]
+
+
+@router.get("/setores/geojson")
+def listar_setores_geojson(geojson: SetoresIUAGeoJSONDep) -> dict:
+    return geojson
 
 
 @router.get("/setores/{cd_setor}")

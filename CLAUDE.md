@@ -24,7 +24,7 @@ não estiver disponível, pergunte ao usuário.
 
 **Fluxo de trabalho combinado com o usuário:** o Claude executa as tasks (código, testes), mas commit e push ficam **sempre** por conta do usuário — nunca rodar `git commit`/`git push` neste track sem pedido explícito.
 
-### Status (atualizado 2026-07-17)
+### Status (atualizado 2026-07-21)
 
 - ✅ Fase 1 (domain — cálculo puro), Fase 2 (repositories — I/O real) e Fase 3 (schemas/service/router) implementadas e testadas. Commit/push ainda não feitos (por conta do usuário).
 - Dados reais do Censo 2022 baixados em `data/raw/censo2022/` (gitignored, ~228MB) + recorte filtrado para Maringá em `data/raw/censo2022/maringa/` (~3MB, `CD_MUN=4115200`, 793 setores).
@@ -38,7 +38,9 @@ não estiver disponível, pergunte ao usuário.
   - `ESPECIE_TOTAL_V00XXX` em `config.py` gerava códigos errados (`V0047` em vez de `V00047`).
   - `TOTAL_DOMICILIOS_V0007` apontava para uma coluna inexistente (`"V0007"`) — a coluna real do arquivo básico é `"v0007"` minúsculo.
   - `malha_repository.carregar_malha_setores` esperava `CD_MUN`/`SITUACAO`/`CD_FCU` no `.gpkg`, mas o arquivo real de Maringá só tem `CD_SETOR` + `geometry`. Corrigido simplificando a malha para só geometria (o `CD_FCU` já vem do arquivo básico, via `df_setores`) — `calcular_iua_setores` não recebe mais `df_malha`.
-- **Pendente:** próxima fase do spec (se houver) — Fases 1-3 e integração com o app principal concluídas. Commit/push desta integração ficam por conta do usuário.
+- **Página de documentação do IUA no frontend concluída (2026-07-21):** `frontend/src/pages/IUADocumentacao.jsx` (metodologia, fontes, limitações — mesmo padrão de `Indicadores.jsx`), registrada em `Sidebar.jsx`/`App.jsx`. Conferida no navegador via script Playwright (`frontend/screenshot_iua_doc.mjs`, não faz parte do build, só ferramenta de conferência ad-hoc).
+- **Mapa interativo do IUA no frontend (2026-07-21):** novo endpoint `GET /iua/setores/geojson` (`src/api.py`: `load_setores_iua_geojson` no `lifespan`, popula `app.state.setores_iua_geojson`; `src/censo_urbano/api/router.py` expõe a rota) — junta a malha real (`malha_repository.carregar_malha_setores`, reprojetada de EPSG:4674 para 4326) com o IUA/D3/D4 já calculados, retornando um `FeatureCollection` GeoJSON. Frontend (`frontend/src/pages/IUA.jsx`) ganhou um mapa Leaflet (`react-leaflet` + `leaflet`, novas deps) com choropleth dos 793 setores, posicionado acima do histograma "Distribuição do IUA". Os 4 KPI cards (IUA médio, D3, D4, Setores sem dado) viram um seletor/filtro do mapa: clique ativa (recolore o mapa pelo indicador daquele card, ou isola os setores sem dado em destaque); clicar de novo desativa e volta ao padrão. **Padrão = nenhum card ativo, todos os 793 setores exibidos, colorido por IUA.** Rampas de cor sequenciais (uma por indicador: indigo/verde/âmbar) validadas com a skill de dataviz (`validate_palette.js --ordinal`). `tests/conftest.py` mocka o novo endpoint (`MOCK_SETORES_IUA_GEOJSON`) seguindo o padrão já estabelecido.
+- **Pendente:** próxima fase do spec (se houver) — Fases 1-4 (frontend incluído) concluídas. Remover `dashboard/` (Streamlit) e `requirements-dashboard.txt` segue pendente (ver README também desatualizado).
 
 ## Padrões de código já estabelecidos
 

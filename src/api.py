@@ -1,3 +1,4 @@
+import json
 import logging
 from contextlib import asynccontextmanager
 from typing import Annotated
@@ -12,8 +13,10 @@ from src.censo_urbano.config import (
     DOMICILIO1_PATH,
     DOMICILIO2_PATH,
     DOMICILIO3_PATH,
+    MALHA_PATH,
 )
 from src.censo_urbano.repositories.censo_repository import carregar_setores
+from src.censo_urbano.repositories.malha_repository import carregar_malha_setores
 from src.censo_urbano.services.iua_service import calcular_iua_setores
 from src.config import CORS_ORIGINS
 from src.data_loader import load_data
@@ -29,6 +32,11 @@ def load_setores_iua() -> pd.DataFrame:
     )
     return calcular_iua_setores(df_setores)
 
+
+def load_setores_iua_geojson(df_iua: pd.DataFrame) -> dict:
+    gdf = carregar_malha_setores(MALHA_PATH).merge(df_iua, on="CD_SETOR", how="left")
+    return json.loads(gdf.to_crs(4326).to_json())
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -42,7 +50,9 @@ async def lifespan(app: FastAPI):
     app.state.df = load_data()
     app.state.df_maringa = load_maringa_data()
     app.state.ibge_loader = IBGEDataLoader()
-    app.state.setores_iua = load_setores_iua()
+    setores_iua = load_setores_iua()
+    app.state.setores_iua = setores_iua
+    app.state.setores_iua_geojson = load_setores_iua_geojson(setores_iua)
     logger.info("Dados carregados com sucesso.")
     yield
     logger.info("Encerrando aplicação.")

@@ -36,6 +36,23 @@ MOCK_SETORES_IUA_DF = pd.DataFrame({
     "iua": [0.7, 0.3],
 })
 
+MOCK_SETORES_IUA_GEOJSON = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                    [-51.94, -23.42], [-51.94, -23.41],
+                    [-51.93, -23.41], [-51.93, -23.42], [-51.94, -23.42],
+                ]],
+            },
+            "properties": {"CD_SETOR": "111", "sem_dado": False, "d3": 0.8, "d4": 0.6, "iua": 0.7},
+        },
+    ],
+}
+
 
 @pytest.fixture
 def client():
@@ -47,14 +64,16 @@ def client():
         patch("src.api.load_data", return_value=MOCK_DF),
         patch("src.api.load_maringa_data", return_value=MOCK_MARINGA_DF),
         patch("src.api.load_setores_iua", return_value=MOCK_SETORES_IUA_DF),
+        patch("src.api.load_setores_iua_geojson", return_value=MOCK_SETORES_IUA_GEOJSON),
     ):
         from src.api import app, get_df, get_ibge_loader, get_maringa_df
-        from src.censo_urbano.api.router import get_setores_iua
+        from src.censo_urbano.api.router import get_setores_iua, get_setores_iua_geojson
 
         app.dependency_overrides[get_df] = lambda: MOCK_DF
         app.dependency_overrides[get_maringa_df] = lambda: MOCK_MARINGA_DF
         app.dependency_overrides[get_ibge_loader] = lambda: mock_loader
         app.dependency_overrides[get_setores_iua] = lambda: MOCK_SETORES_IUA_DF
+        app.dependency_overrides[get_setores_iua_geojson] = lambda: MOCK_SETORES_IUA_GEOJSON
 
         with TestClient(app) as c:
             yield c
