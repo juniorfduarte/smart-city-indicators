@@ -64,6 +64,41 @@ function AjustarZoom({ geojson }) {
   return null;
 }
 
+function CamadaSetores({ geojson, metricaMapa }) {
+  return (
+    <>
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
+      />
+      {geojson && (
+        <>
+          <GeoJSON
+            key={metricaMapa}
+            data={geojson}
+            style={feature => estiloSetor(feature, metricaMapa)}
+            onEachFeature={aoCarregarSetor}
+          />
+          <AjustarZoom geojson={geojson} />
+        </>
+      )}
+    </>
+  );
+}
+
+function Legenda({ metricaMapa }) {
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 16px", marginTop: 10 }}>
+      {(metricaMapa === "sem_dado" ? LEGENDA_SEM_DADO : construirLegenda(RAMPAS[metricaMapa ?? "iua"])).map(item => (
+        <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ width: 12, height: 12, borderRadius: 3, background: item.cor, display: "inline-block", border: "0.5px solid rgba(0,0,0,0.1)" }} />
+          <span style={{ fontSize: 11, color: "#888" }}>{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function estiloSetor(feature, metrica) {
   const p = feature.properties;
   if (metrica === "sem_dado") {
@@ -140,9 +175,21 @@ export default function IUA() {
   const [geojson, setGeojson] = useState(null);
   const [erroMapa, setErroMapa] = useState(null);
   const [metricaMapa, setMetricaMapa] = useState(null);
+  const [mapaExpandido, setMapaExpandido] = useState(false);
   const POR_PAG = 10;
 
   const alternarFiltroMapa = id => setMetricaMapa(atual => (atual === id ? null : id));
+
+  useEffect(() => {
+    if (!mapaExpandido) return;
+    const aoTeclar = e => { if (e.key === "Escape") setMapaExpandido(false); };
+    document.addEventListener("keydown", aoTeclar);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", aoTeclar);
+      document.body.style.overflow = "";
+    };
+  }, [mapaExpandido]);
 
   const buscarDados = useCallback(async () => {
     setLoading(true);
@@ -246,7 +293,15 @@ export default function IUA() {
 
         {/* Mapa dos setores censitários */}
         <div style={{ background: "#fff", border: "0.5px solid #e0e0e0", borderRadius: 12, padding: "1rem 1.25rem", marginBottom: 12 }}>
-          <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 500, color: "#1a1a1a" }}>Mapa dos setores censitários</p>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: "#1a1a1a" }}>Mapa dos setores censitários</p>
+            <button
+              onClick={() => setMapaExpandido(true)}
+              style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, fontSize: 11, padding: "4px 10px", borderRadius: 6, cursor: "pointer", background: "#f5f5f3", border: "0.5px solid #e0e0e0", color: "#555" }}
+            >
+              <i className="ti ti-arrows-maximize" aria-hidden="true" /> Expandir
+            </button>
+          </div>
           <p style={{ margin: "0 0 12px", fontSize: 11, color: "#888" }}>
             {metricaMapa === "sem_dado"
               ? "Setores sem dado (sigilo estatístico do IBGE) destacados em vermelho"
@@ -262,34 +317,54 @@ export default function IUA() {
           )}
 
           <div style={{ borderRadius: 8, overflow: "hidden", border: "0.5px solid #e0e0e0" }}>
-            <MapContainer center={CENTRO_MARINGA} zoom={12} style={{ height: 450, width: "100%" }} scrollWheelZoom={false}>
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
-              {geojson && (
-                <>
-                  <GeoJSON
-                    key={metricaMapa}
-                    data={geojson}
-                    style={feature => estiloSetor(feature, metricaMapa)}
-                    onEachFeature={aoCarregarSetor}
-                  />
-                  <AjustarZoom geojson={geojson} />
-                </>
-              )}
+            <MapContainer center={CENTRO_MARINGA} zoom={12} style={{ height: 550, width: "100%" }} scrollWheelZoom={false}>
+              <CamadaSetores geojson={geojson} metricaMapa={metricaMapa} />
             </MapContainer>
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 16px", marginTop: 10 }}>
-            {(metricaMapa === "sem_dado" ? LEGENDA_SEM_DADO : construirLegenda(RAMPAS[metricaMapa ?? "iua"])).map(item => (
-              <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ width: 12, height: 12, borderRadius: 3, background: item.cor, display: "inline-block", border: "0.5px solid rgba(0,0,0,0.1)" }} />
-                <span style={{ fontSize: 11, color: "#888" }}>{item.label}</span>
-              </div>
-            ))}
-          </div>
+          <Legenda metricaMapa={metricaMapa} />
         </div>
+
+        {/* Modal do mapa em tela cheia */}
+        {mapaExpandido && (
+          <div
+            onClick={() => setMapaExpandido(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: "3vh 3vw" }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{ background: "#fff", borderRadius: 12, padding: "1rem 1.25rem", width: "100%", maxWidth: 1200, height: "94vh", display: "flex", flexDirection: "column" }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: "#1a1a1a" }}>Mapa dos setores censitários</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 11, color: "#888" }}>
+                    {metricaMapa === "sem_dado"
+                      ? "Setores sem dado (sigilo estatístico do IBGE) destacados em vermelho"
+                      : metricaMapa === null
+                      ? "Todos os setores exibidos — colorido por IUA (padrão)"
+                      : `${NOME_METRICA[metricaMapa]} por setor — cor mais escura indica valor mais alto`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setMapaExpandido(false)}
+                  aria-label="Fechar mapa expandido"
+                  style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, padding: "6px 12px", borderRadius: 6, cursor: "pointer", background: "#f5f5f3", border: "0.5px solid #e0e0e0", color: "#555" }}
+                >
+                  <i className="ti ti-x" aria-hidden="true" /> Fechar
+                </button>
+              </div>
+
+              <div style={{ borderRadius: 8, overflow: "hidden", border: "0.5px solid #e0e0e0", flex: 1, minHeight: 0 }}>
+                <MapContainer center={CENTRO_MARINGA} zoom={12} style={{ height: "100%", width: "100%" }} scrollWheelZoom={true}>
+                  <CamadaSetores geojson={geojson} metricaMapa={metricaMapa} />
+                </MapContainer>
+              </div>
+
+              <Legenda metricaMapa={metricaMapa} />
+            </div>
+          </div>
+        )}
 
         {/* Histograma */}
         <div style={{ background: "#fff", border: "0.5px solid #e0e0e0", borderRadius: 12, padding: "1rem 1.25rem", marginBottom: 12 }}>

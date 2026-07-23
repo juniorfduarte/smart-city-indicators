@@ -117,8 +117,8 @@ export default function Dashboard() {
       <div style={{ padding: "1.25rem" }}>
 
         {/* Filtros */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto auto", gap: 10, marginBottom: "1.25rem", alignItems: "end" }}>
-          <div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: "1.25rem", alignItems: "end" }}>
+          <div style={{ flex: "1 1 160px" }}>
             <label style={{ fontSize: 11, color: "var(--color-text-secondary)", display: "block", marginBottom: 4 }}>Bairro</label>
             <input
               list="bairros-list"
@@ -131,7 +131,7 @@ export default function Dashboard() {
               {bairrosUnicos.map(b => <option key={b} value={b} />)}
             </datalist>
           </div>
-          <div>
+          <div style={{ flex: "1 1 160px" }}>
             <label style={{ fontSize: 11, color: "var(--color-text-secondary)", display: "block", marginBottom: 4 }}>Zona</label>
             <input
               list="zonas-list"
@@ -145,11 +145,11 @@ export default function Dashboard() {
             </datalist>
           </div>
           <button onClick={() => { setFiltroBairro(inputBairro); setFiltroZona(inputZona); }}
-            style={{ padding: "0 20px", height: 36, cursor: "pointer" }}>
+            style={{ flex: "0 0 auto", padding: "0 20px", height: 36, cursor: "pointer" }}>
             <i className="ti ti-search" aria-hidden="true" /> Filtrar
           </button>
           <button onClick={() => { setInputBairro(""); setInputZona(""); setFiltroBairro(""); setFiltroZona(""); }}
-            style={{ padding: "0 16px", height: 36, cursor: "pointer" }}>
+            style={{ flex: "0 0 auto", padding: "0 16px", height: 36, cursor: "pointer" }}>
             <i className="ti ti-x" aria-hidden="true" /> Limpar
           </button>
         </div>
@@ -172,7 +172,7 @@ export default function Dashboard() {
         </div>
 
         {/* Gráficos row 1 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 12, marginBottom: 12 }}>
 
           {/* Score por bairro */}
           <div style={{ background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: 12, padding: "1rem 1.25rem" }}>

@@ -5,23 +5,25 @@ const MENU = [
   { id: "iua-doc",     label: "Doc. IUA",     icon: "ti-file-text" },
 ];
 
-export default function Sidebar({ paginaAtiva, setPagina, aberta, setAberta }) {
+export default function Sidebar({ paginaAtiva, setPagina, aberta, setAberta, menuMobileAberto, fecharMenuMobile }) {
   return (
-    <aside style={{
-      width: aberta ? 220 : 56,
-      minHeight: "100vh",
-      background: "#0a5c47",
-      transition: "width 0.25s ease",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden",
-      flexShrink: 0,
-    }}>
+    <aside
+      className={`sidebar${menuMobileAberto ? " is-open" : ""}`}
+      style={{
+        width: aberta ? 220 : 56,
+        minHeight: "100vh",
+        background: "#0a5c47",
+        transition: "width 0.25s ease",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        flexShrink: 0,
+      }}>
 
       {/* Toggle + logo */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "1rem 14px", borderBottom: "0.5px solid rgba(255,255,255,0.1)" }}>
         <button
-          onClick={() => setAberta(a => !a)}
+          onClick={() => { setAberta(a => !a); fecharMenuMobile(); }}
           aria-label={aberta ? "Recolher menu" : "Expandir menu"}
           style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#fff", fontSize: 20, display: "flex", alignItems: "center" }}
         >
@@ -41,7 +43,7 @@ export default function Sidebar({ paginaAtiva, setPagina, aberta, setAberta }) {
           return (
             <button
               key={item.id}
-              onClick={() => setPagina(item.id)}
+              onClick={() => { setPagina(item.id); fecharMenuMobile(); }}
               title={!aberta ? item.label : undefined}
               style={{
                 width: "100%",

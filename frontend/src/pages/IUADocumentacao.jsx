@@ -90,7 +90,7 @@ export default function IUADocumentacao() {
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px", fontSize: 13 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "10px 24px", fontSize: 13 }}>
               <div style={{ gridColumn: "1 / -1" }}>
                 <span style={{ fontSize: 11, fontWeight: 500, color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>Descrição</span>
                 <p style={{ margin: "4px 0 0", color: "#333", lineHeight: 1.6 }}>{ind.descricao}</p>
