@@ -11,10 +11,10 @@ const DOCS = [
     cor: COR.indigo,
     icone: "ti-chart-histogram",
     descricao: "Índice experimental de qualidade urbana intraurbana para Maringá-PR, calculado por setor censitário a partir de dados públicos do Censo 2022 (IBGE). Inspirado na metodologia do IBEU (Índice de Bem-Estar Urbano) do Observatório das Metrópoles — não é uma implementação oficial dela.",
-    formula: "IUA(s) = (D3(s) + D4(s)) / 2 — média simples das duas dimensões do IBEU disponíveis no nível de setor censitário para o Censo 2022.",
+    formula: "IUA(s) = (D3(s) + D4(s)) / 2 —> média simples das duas dimensões do IBEU disponíveis no nível de setor censitário para o Censo 2022.",
     escala: "0 a 1 — quanto maior, melhor a condição urbana relativa do setor dentro do universo de comparação (setores de Maringá).",
     fonte: "IBGE — Censo 2022, Agregados por Setores Censitários (Resultados do Universo).",
-    notas: "O IBEU original combina 5 dimensões (D1 Mobilidade, D2 Condições Ambientais, D3 Habitacionais, D4 Serviços Coletivos, D5 Infraestrutura). Só D3 e D4 estão disponíveis no nível de setor censitário no Censo 2022 — os microdados da amostra (base de D1) e a pesquisa do entorno (base de D2 e D5) foram adiados pelo IBGE para 2026. A arquitetura está preparada para incorporar as demais dimensões quando forem liberadas.",
+    notas: "O IBEU original combina 5 dimensões (D1 Mobilidade, D2 Condições Ambientais, D3 Habitacionais, D4 Serviços Coletivos, D5 Infraestrutura). Só D3 e D4 estão disponíveis no nível de setor censitário no Censo 2022. Os microdados da amostra (base de D1) e a pesquisa do entorno (base de D2 e D5) foram adiados pelo IBGE para 2026. A arquitetura está preparada para incorporar as demais dimensões quando forem liberadas.",
   },
   {
     key: "d3",
@@ -22,10 +22,10 @@ const DOCS = [
     cor: COR.verde,
     icone: "ti-home",
     descricao: "Mede a adequação das condições físicas dos domicílios do setor: tipo de construção (espécie do domicílio), densidade de moradores por banheiro e ausência de aglomerado subnormal (favela) no setor.",
-    formula: "D3(s) = (espécie_adequada + densidade_banheiro_aprox + não_aglomerado_subnormal) / 3 — o IBEU original também usa material de parede e densidade morador/dormitório, variáveis inexistentes no Censo 2022; peso redistribuído entre os 3 indicadores disponíveis.",
+    formula: "D3(s) = (espécie_adequada + densidade_banheiro_aprox + não_aglomerado_subnormal) / 3 —> o IBEU original também usa material de parede e densidade morador/dormitório, variáveis inexistentes no Censo 2022; peso redistribuído entre os 3 indicadores disponíveis.",
     escala: "0 a 1, normalizado de forma relacional (min-max) dentro do universo de comparação.",
     fonte: "Variáveis V00047–V00052 (espécie do domicílio), V00232–V00238 + V00552–V00558 (banheiro/moradores) e CD_FCU (aglomerado subnormal) — Censo 2022.",
-    notas: "Densidade morador/banheiro é uma aproximação por faixa agregada, já que o Censo não divulga o par moradores/banheiros por domicílio individual. Em Maringá, nenhum setor tem aglomerado subnormal delimitado pelo IBGE em 2022 — esse indicador é constante (100%) na cidade.",
+    notas: "Densidade morador/banheiro é uma aproximação por faixa agregada, já que o Censo não divulga o par moradores/banheiros por domicílio individual. Em Maringá, nenhum setor tem aglomerado subnormal delimitado pelo IBGE em 2022. Esse indicador é constante (100%) na cidade.",
   },
   {
     key: "d4",
@@ -33,7 +33,7 @@ const DOCS = [
     cor: COR.amber,
     icone: "ti-droplet",
     descricao: "Mede o acesso dos domicílios a infraestrutura básica: abastecimento de água por rede geral, esgotamento sanitário adequado e coleta de lixo.",
-    formula: "D4(s) = água·1/4 + esgoto·1/2 + lixo·1/4 — o IBEU original também usa energia elétrica adequada, variável inexistente no Censo 2022; peso redistribuído entre os 3 indicadores disponíveis.",
+    formula: "D4(s) = água·1/4 + esgoto·1/2 + lixo·1/4 —> o IBEU original também usa energia elétrica adequada, variável inexistente no Censo 2022; peso redistribuído entre os 3 indicadores disponíveis.",
     escala: "0 a 1, normalizado de forma relacional (min-max) dentro do universo de comparação.",
     fonte: "Variáveis V00111–V00118 (água), V00309 (esgoto) e V00397–V00398 (lixo) — Censo 2022.",
     notas: "Energia elétrica adequada não é medida por não existir variável equivalente no Censo 2022.",
@@ -41,13 +41,13 @@ const DOCS = [
 ];
 
 const LIMITACOES = [
-  "Índice experimental — inspirado no IBEU, mas não é a implementação oficial do Observatório das Metrópoles (que usa dados de 2010 nas 5 dimensões completas).",
+  "Índice experimental, inspirado no IBEU, mas não é a implementação oficial do Observatório das Metrópoles (que usa dados de 2010 nas 5 dimensões completas).",
   "Só 2 das 5 dimensões do IBEU (D3 + D4): D1 (Mobilidade), D2 (Ambientais) e D5 (Infraestrutura) dependem de bases do Censo 2022 ainda não liberadas em nível intraurbano.",
   "Unidade dos indicadores é domicílios, não pessoas.",
-  "Sigilo estatístico: células suprimidas pelo IBGE (marcador \"X\", sempre um valor de 1 ou 2 domicílios) são tratadas como 0 — erro máximo de 1 a 2 domicílios por célula.",
-  "Setores com menos de 5 domicílios particulares permanentes são marcados como \"sem dado\" e excluídos do cálculo — limiar oficial do IBGE para omissão de variáveis.",
+  "Sigilo estatístico: células suprimidas pelo IBGE (marcador \"X\", sempre um valor de 1 ou 2 domicílios) são tratadas como 0. Erro máximo de 1 a 2 domicílios por célula.",
+  "Setores com menos de 5 domicílios particulares permanentes são marcados como \"sem dado\" e excluídos do cálculo. Limiar oficial do IBGE para omissão de variáveis.",
   "Densidade morador/banheiro é uma aproximação por faixa agregada de domicílios, não o cálculo domicílio a domicílio do IBEU original.",
-  "Granularidade limitada ao setor censitário — nível mais fino de divulgação pública do Censo. Não é possível descer a quadra ou lote com esta fonte.",
+  "Granularidade limitada ao setor censitário, nível mais fino de divulgação pública do Censo. Não é possível descer a quadra ou lote com esta fonte.",
 ];
 
 const REFERENCIAS = [
