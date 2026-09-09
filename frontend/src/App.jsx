@@ -6,7 +6,7 @@ import IUA from "./pages/IUA";
 import IUADocumentacao from "./pages/IUADocumentacao";
 
 export default function App() {
-  const [pagina, setPagina]           = useState("dashboard");
+  const [pagina, setPagina]           = useState("iua");
   const [aberta, setAberta]           = useState(true);
   const [menuMobileAberto, setMenuMobileAberto] = useState(false);
 
@@ -14,8 +14,8 @@ export default function App() {
 
   const renderPagina = () => {
     switch (pagina) {
-      case "dashboard":   return <Dashboard />;
-      case "indicadores": return <Indicadores />;
+      // case "dashboard":   return <Dashboard />;
+      // case "indicadores": return <Indicadores />;
       case "iua":          return <IUA />;
       case "iua-doc":      return <IUADocumentacao />;
       default:            return <Dashboard />;

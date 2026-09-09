@@ -255,7 +255,7 @@ export default function IUA() {
 
         {/* Nota metodológica */}
         <div style={{ background: "#f0eefc", border: "0.5px solid #d8d3f5", borderRadius: 10, padding: "0.875rem 1.25rem", marginBottom: "1.25rem", fontSize: 12, color: "#332a66", lineHeight: 1.6 }}>
-          <i className="ti ti-info-circle" aria-hidden="true" /> O IUA é um índice experimental inspirado na metodologia do <strong>IBEU</strong> (Observatório das Metrópoles) — <strong>não é uma implementação oficial dela</strong>. Calculado a partir de dados públicos do Censo 2022 (IBGE), em uma linha independente da base da prefeitura. Setores com menos de 5 domicílios ("sem dado") são excluídos do cálculo por sigilo estatístico do IBGE.
+          <i className="ti ti-info-circle" aria-hidden="true" /> O IUA é um índice experimental inspirado na metodologia do <strong>IBEU</strong> (Observatório das Metrópoles). <strong>não é uma implementação oficial dela</strong>. Calculado a partir de dados públicos do Censo 2022 (IBGE), em uma linha independente da base da prefeitura. Setores com menos de 5 domicílios ("sem dado") são excluídos do cálculo por sigilo estatístico do IBGE.
         </div>
 
         {erro && (
@@ -288,7 +288,7 @@ export default function IUA() {
           </button>
         </div>
         <p style={{ margin: "0 0 1.25rem", fontSize: 10.5, color: "#aaa" }}>
-          <i className="ti ti-click" aria-hidden="true" /> Clique em um card para focar o mapa nele — clique de novo para voltar ao padrão (todos os setores, colorido por IUA).
+          <i className="ti ti-click" aria-hidden="true" /> Clique em um card para focar o mapa nele. Clique de novo para voltar ao padrão (todos os setores, colorido por IUA).
         </p>
 
         {/* Mapa dos setores censitários */}
